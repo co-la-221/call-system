@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>○○ CAFE - Kitchen</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Bebas+Neue&family=Noto+Serif+JP:wght@200;300;400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ivory: #f7f3ec;
+    --cream: #ede8df;
+    --sand: #d4c9b5;
+    --taupe: #b5a48e;
+    --brown: #7c6347;
+    --espresso: #3d2b1a;
+    --gold: #c9a96e;
+    --gold-light: #e8d5a3;
+    --white: #fdfaf6;
+  }
+
+  html, body { width: 100%; min-height: 100vh; }
+
+  body {
+    font-family: 'Noto Serif JP', serif;
+    background: var(--espresso);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      repeating-linear-gradient(92deg, transparent 0px, transparent 3px, rgba(255,255,255,0.012) 3px, rgba(255,255,255,0.012) 6px),
+      repeating-linear-gradient(88deg, transparent 0px, transparent 8px, rgba(0,0,0,0.04) 8px, rgba(0,0,0,0.04) 16px),
+      linear-gradient(175deg, #2a1a0e 0%, #3d2b1a 30%, #4a3220 60%, #3a2518 100%);
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    opacity: 0.5;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  header {
+    position: relative;
+    z-index: 10;
+    padding: 0 48px;
+    height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(201,169,110,0.3);
+    background: rgba(20,10,5,0.4);
+    backdrop-filter: blur(8px);
+  }
+
+  .logo-area { display: flex; align-items: center; gap: 16px; }
+
+  .logo-img {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--gold) 0%, var(--brown) 100%);
+    border: 1px solid rgba(201,169,110,0.5);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem; color: var(--ivory); letter-spacing: 1px;
+  }
+
+  .logo-text { display: flex; flex-direction: column; gap: 1px; }
+  .logo-name { font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--gold-light); letter-spacing: 4px; font-weight: 400; line-height: 1; }
+  .logo-sub { font-size: 0.55rem; letter-spacing: 5px; color: var(--taupe); text-transform: uppercase; font-family: 'Cormorant Garamond', serif; }
+
+  .header-right { display: flex; align-items: center; gap: 16px; }
+  .kitchen-badge {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.65rem;
+    letter-spacing: 4px;
+    color: var(--taupe);
+    text-transform: uppercase;
+    font-style: italic;
+    border: 1px solid rgba(201,169,110,0.25);
+    padding: 4px 12px;
+  }
+  .sync-status {
+    font-size: 0.65rem;
+    letter-spacing: 2px;
+    color: var(--taupe);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .sync-dot { width: 6px; height: 6px; border-radius: 50%; background: #555; transition: all 0.4s; }
+  .sync-dot.connected { background: #8fc97f; box-shadow: 0 0 10px rgba(143,201,127,0.6); animation: breathe 3s ease infinite; }
+
+  /* メイン */
+  main {
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 32px 24px;
+    gap: 24px;
+    max-width: 480px;
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  .section-label {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.7rem;
+    letter-spacing: 6px;
+    color: var(--taupe);
+    text-transform: uppercase;
+    font-style: italic;
+    text-align: center;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .section-label::before, .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(201,169,110,0.3));
+  }
+  .section-label::after {
+    background: linear-gradient(90deg, rgba(201,169,110,0.3), transparent);
+  }
+
+  /* テンキーパネル */
+  .tenkey-panel {
+    width: 100%;
+    background: rgba(0,0,0,0.2);
+    border: 1px solid rgba(201,169,110,0.2);
+    padding: 24px;
+    position: relative;
+  }
+
+  .corner { position: absolute; width: 20px; height: 20px; border-color: rgba(201,169,110,0.35); border-style: solid; }
+  .corner-tl { top: 8px; left: 8px; border-width: 1px 0 0 1px; }
+  .corner-tr { top: 8px; right: 8px; border-width: 1px 1px 0 0; }
+  .corner-bl { bottom: 8px; left: 8px; border-width: 0 0 1px 1px; }
+  .corner-br { bottom: 8px; right: 8px; border-width: 0 1px 1px 0; }
+
+  .num-display {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 5rem;
+    color: var(--ivory);
+    background: rgba(0,0,0,0.25);
+    border: 1px solid rgba(201,169,110,0.2);
+    width: 100%;
+    text-align: center;
+    padding: 12px 16px;
+    letter-spacing: 10px;
+    margin-bottom: 20px;
+    min-height: 96px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-shadow: 0 0 30px rgba(201,169,110,0.2);
+  }
+  .num-display.empty { color: rgba(181,164,142,0.25); }
+
+  .tenkey-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+
+  .key {
+    aspect-ratio: 1;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(201,169,110,0.15);
+    color: var(--sand);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.8rem;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.12s;
+    display: flex; align-items: center; justify-content: center;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .key:hover { background: rgba(201,169,110,0.1); border-color: rgba(201,169,110,0.35); color: var(--gold-light); }
+  .key:active { transform: scale(0.93); background: rgba(201,169,110,0.15); }
+
+  .key.zero { grid-column: 1/2; aspect-ratio: auto; padding: 16px; }
+  .key.clear {
+    grid-column: 2/3; aspect-ratio: auto; padding: 16px;
+    font-family: 'Noto Serif JP', serif; font-size: 0.75rem; letter-spacing: 2px;
+    color: var(--taupe);
+  }
+  .key.clear:hover { color: var(--gold); }
+
+  .call-btn {
+    grid-column: 3/4; aspect-ratio: auto; padding: 16px;
+    background: rgba(201,169,110,0.15);
+    border: 1px solid rgba(201,169,110,0.5);
+    color: var(--gold-light);
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    letter-spacing: 4px;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex; align-items: center; justify-content: center;
+    font-style: italic;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .call-btn:hover { background: rgba(201,169,110,0.25); }
+  .call-btn:active { transform: scale(0.96); }
+
+  /* 履歴 */
+  .history-panel {
+    width: 100%;
+    background: rgba(0,0,0,0.15);
+    border: 1px solid rgba(201,169,110,0.15);
+    padding: 16px 20px;
+  }
+
+  .history-top {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 14px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(201,169,110,0.15);
+  }
+
+  .history-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.7rem; letter-spacing: 5px; color: var(--taupe);
+    text-transform: uppercase; font-style: italic;
+  }
+
+  .clear-btn {
+    font-size: 0.65rem; letter-spacing: 2px;
+    color: rgba(181,164,142,0.4);
+    background: transparent;
+    border: 1px solid rgba(181,164,142,0.2);
+    padding: 4px 10px; cursor: pointer;
+    font-family: 'Noto Serif JP', serif;
+    transition: all 0.15s;
+  }
+  .clear-btn:hover { color: var(--taupe); border-color: rgba(181,164,142,0.4); }
+
+  .queue-list { display: flex; flex-direction: column; gap: 6px; max-height: 280px; overflow-y: auto; }
+
+  .queue-item {
+    display: flex; align-items: center;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(201,169,110,0.08);
+    border-left: 3px solid rgba(201,169,110,0.1);
+    padding: 10px 14px;
+    animation: slideIn 0.3s ease;
+  }
+  .queue-item.calling { border-left-color: var(--gold); background: rgba(201,169,110,0.06); }
+  .queue-item.done { opacity: 0.3; }
+
+  .q-num { font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; color: var(--sand); width: 72px; letter-spacing: 3px; }
+  .queue-item.calling .q-num { color: var(--gold); }
+
+  .q-status { flex: 1; font-size: 0.72rem; color: var(--taupe); }
+  .q-status .label { font-size: 0.6rem; letter-spacing: 2px; text-transform: uppercase; font-family: 'Cormorant Garamond', serif; font-style: italic; }
+
+  .q-actions { display: flex; gap: 6px; }
+  .q-btn {
+    padding: 5px 10px;
+    border: 1px solid rgba(201,169,110,0.2);
+    font-size: 0.68rem; cursor: pointer;
+    font-family: 'Noto Serif JP', serif;
+    transition: all 0.15s;
+    background: transparent; color: var(--taupe); letter-spacing: 1px;
+  }
+  .q-btn.recall { border-color: rgba(201,169,110,0.4); color: var(--gold); }
+  .q-btn.recall:hover { background: rgba(201,169,110,0.15); }
+  .q-btn.complete { border-color: rgba(143,201,127,0.3); color: rgba(143,201,127,0.7); }
+  .q-btn.complete:hover { background: rgba(143,201,127,0.1); }
+
+  .empty-state { text-align: center; padding: 28px; color: rgba(181,164,142,0.25); font-size: 0.8rem; font-family: 'Cormorant Garamond', serif; letter-spacing: 3px; font-style: italic; }
+
+  @keyframes breathe { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(0.85); } }
+  @keyframes slideIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+  .password-screen {
+    position: fixed;
+    inset: 0;
+    background: var(--espresso);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+  }
+
+  .password-screen::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      repeating-linear-gradient(92deg, transparent 0px, transparent 3px, rgba(255,255,255,0.012) 3px, rgba(255,255,255,0.012) 6px),
+      linear-gradient(175deg, #2a1a0e 0%, #3d2b1a 30%, #4a3220 60%, #3a2518 100%);
+    z-index: 0;
+  }
+
+  .password-inner {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    border: 1px solid rgba(201,169,110,0.2);
+    padding: 40px 48px;
+    background: rgba(0,0,0,0.2);
+  }
+
+  .password-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    color: var(--gold-light);
+    letter-spacing: 6px;
+    font-style: italic;
+  }
+
+  .password-sub {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.7rem;
+    letter-spacing: 4px;
+    color: var(--taupe);
+    text-transform: uppercase;
+  }
+
+  .password-input {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(201,169,110,0.3);
+    color: var(--ivory);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem;
+    letter-spacing: 8px;
+    padding: 12px 24px;
+    text-align: center;
+    width: 200px;
+    outline: none;
+  }
+  .password-input:focus { border-color: rgba(201,169,110,0.6); }
+
+  .password-btn {
+    padding: 12px 32px;
+    background: rgba(201,169,110,0.15);
+    border: 1px solid rgba(201,169,110,0.5);
+    color: var(--gold-light);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1rem;
+    letter-spacing: 4px;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-style: italic;
+  }
+  .password-btn:hover { background: rgba(201,169,110,0.25); }
+
+  .password-error {
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    color: #c07070;
+    font-family: 'Noto Serif JP', serif;
+    display: none;
+  }
+  .password-error.show { display: block; }
+  .queue-list::-webkit-scrollbar-track { background: transparent; }
+  .queue-list::-webkit-scrollbar-thumb { background: rgba(201,169,110,0.2); }
+
+  .message-input {
+    width: 100%;
+    background: rgba(0,0,0,0.2);
+    border: 1px solid rgba(201,169,110,0.2);
+    color: var(--sand);
+    font-family: 'Noto Serif JP', serif;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    padding: 10px 14px;
+    outline: none;
+    resize: none;
+    line-height: 1.6;
+  }
+  .message-input:focus { border-color: rgba(201,169,110,0.4); }
+  .message-hint {
+    font-size: 0.6rem;
+    letter-spacing: 2px;
+    color: rgba(181,164,142,0.4);
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    text-align: right;
+    margin-top: 4px;
+  }
+    width: 100%;
+    background: rgba(0,0,0,0.2);
+    border: 1px solid rgba(201,169,110,0.2);
+    color: var(--sand);
+    font-family: 'Noto Serif JP', serif;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    padding: 10px 14px;
+    appearance: none;
+    cursor: pointer;
+    outline: none;
+  }
+  .voice-select:focus { border-color: rgba(201,169,110,0.4); }
+  .voice-select option { background: #2a1a0e; color: var(--sand); }
+</style>
+</head>
+<body>
+
+<div class="password-screen" id="passwordScreen">
+  <div class="password-inner">
+    <div class="password-title">○○ Cafe</div>
+    <div class="password-sub">Kitchen Access</div>
+    <input class="password-input" type="password" id="passwordInput" placeholder="----" maxlength="10"
+      onkeydown="if(event.key==='Enter') checkPassword()">
+    <button class="password-btn" onclick="checkPassword()">Enter</button>
+    <div class="password-error" id="passwordError">パスワードが違います</div>
+  </div>
+</div>
+
+<header>
+  <div class="logo-area">
+    <div class="logo-img">○○</div>
+    <div class="logo-text">
+      <div class="logo-name">○○ Cafe</div>
+      <div class="logo-sub">Order & Pickup System</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="kitchen-badge">Kitchen</div>
+    <div class="sync-status">
+      <div class="sync-dot" id="syncDot"></div>
+      <span id="syncText">接続中...</span>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="section-label">Voice</div>
+  <select class="voice-select" id="voiceSelect">
+    <option value="">音声を選択してください</option>
+  </select>
+
+  <div class="section-label">Message</div>
+  <div>
+    <textarea class="message-input" id="messageInput" rows="2">ただいま、{番号}番のお客様、カウンターまでお越しください</textarea>
+    <div class="message-hint">{番号} が呼び出し番号に自動で置き換わります</div>
+  </div>
+
+  <div class="section-label">Call Number</div>
+
+  <div class="tenkey-panel">
+    <div class="corner corner-tl"></div>
+    <div class="corner corner-tr"></div>
+    <div class="corner corner-bl"></div>
+    <div class="corner corner-br"></div>
+
+    <div class="num-display empty" id="numDisplay">---</div>
+
+    <div class="tenkey-grid">
+      <button class="key" onclick="pressKey('7')">7</button>
+      <button class="key" onclick="pressKey('8')">8</button>
+      <button class="key" onclick="pressKey('9')">9</button>
+      <button class="key" onclick="pressKey('4')">4</button>
+      <button class="key" onclick="pressKey('5')">5</button>
+      <button class="key" onclick="pressKey('6')">6</button>
+      <button class="key" onclick="pressKey('1')">1</button>
+      <button class="key" onclick="pressKey('2')">2</button>
+      <button class="key" onclick="pressKey('3')">3</button>
+      <button class="key zero" onclick="pressKey('0')">0</button>
+      <button class="key clear" onclick="clearKey()">⌫ 消す</button>
+      <button class="call-btn" onclick="callNumber()">Call</button>
+    </div>
+  </div>
+
+  <div class="section-label">History</div>
+
+  <div class="history-panel">
+    <div class="history-top">
+      <div class="history-title">呼び出し履歴</div>
+      <button class="clear-btn" onclick="clearAll()">🗑 クリア</button>
+    </div>
+    <div class="queue-list" id="queueList">
+      <div class="empty-state">まだ呼び出しはありません</div>
+    </div>
+  </div>
+</main>
+
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+  import { getDatabase, ref, set, onValue, update } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+
+  const app = initializeApp({ databaseURL: 'https://yobidashi-poc-default-rtdb.firebaseio.com/' });
+  const db = getDatabase(app);
+
+  // パスワード認証
+  const PASS = '0221';
+  if (sessionStorage.getItem('auth') === PASS) {
+    document.getElementById('passwordScreen').style.display = 'none';
+  }
+  window.checkPassword = function() {
+    const input = document.getElementById('passwordInput').value;
+    if (input === PASS) {
+      sessionStorage.setItem('auth', PASS);
+      document.getElementById('passwordScreen').style.display = 'none';
+    } else {
+      document.getElementById('passwordError').classList.add('show');
+      document.getElementById('passwordInput').value = '';
+    }
+  };
+
+  let inputStr = '';
+  let calledHistory = [];
+  let queueData = {};
+  let selectedVoice = null;
+
+  function pad(n) { return String(n).padStart(3, '0'); }
+
+  // 音声一覧を読み込む
+  function loadVoices() {
+    const voices = speechSynthesis.getVoices().filter(v => v.lang.startsWith('ja'));
+    const select = document.getElementById('voiceSelect');
+    select.innerHTML = '<option value="">音声を選択してください</option>';
+    voices.forEach((v, i) => {
+      const opt = document.createElement('option');
+      opt.value = i;
+      opt.textContent = `${v.name} (${v.lang})`;
+      select.appendChild(opt);
+    });
+    select.onchange = () => {
+      const idx = select.value;
+      selectedVoice = idx !== '' ? voices[parseInt(idx)] : null;
+      set(ref(db, 'voiceSettings'), {
+        name: selectedVoice?.name || null,
+        message: document.getElementById('messageInput').value
+      });
+    };
+  }
+
+  // メッセージ変更時にFirebaseに保存
+  document.getElementById('messageInput').addEventListener('input', () => {
+    set(ref(db, 'voiceSettings'), {
+      name: selectedVoice?.name || null,
+      message: document.getElementById('messageInput').value
+    });
+  });
+
+  speechSynthesis.onvoiceschanged = loadVoices;
+  loadVoices();
+
+  function updateDisplay() {
+    const el = document.getElementById('numDisplay');
+    if (!inputStr) { el.textContent = '---'; el.classList.add('empty'); }
+    else { el.textContent = inputStr; el.classList.remove('empty'); }
+  }
+
+  window.pressKey = function(k) {
+    if (inputStr.length >= 3) return;
+    inputStr += k;
+    updateDisplay();
+  };
+
+  window.clearKey = function() {
+    inputStr = inputStr.slice(0, -1);
+    updateDisplay();
+  };
+
+  onValue(ref(db, '.info/connected'), (snap) => {
+    const connected = snap.val();
+    document.getElementById('syncDot').className = 'sync-dot' + (connected ? ' connected' : '');
+    document.getElementById('syncText').textContent = connected ? '同期中' : '切断';
+  });
+
+  onValue(ref(db, 'queue'), (snap) => { queueData = snap.val() || {}; renderQueue(); });
+  onValue(ref(db, 'current'), (snap) => {
+    const data = snap.val();
+    if (data && data.history) calledHistory = data.history;
+  });
+
+  window.callNumber = async function() {
+    if (!inputStr) return;
+    const num = parseInt(inputStr);
+    const time = new Date().toISOString();
+    await set(ref(db, `queue/${num}`), { num, status: 'calling', time });
+    calledHistory = [num, ...calledHistory.filter(n => n !== num)].slice(0, 6);
+    await set(ref(db, 'current'), { num, history: calledHistory, time });
+    await set(ref(db, 'history'), calledHistory);
+    inputStr = '';
+    updateDisplay();
+  };
+
+  window.recallNum = async function(n) {
+    const time = new Date().toISOString();
+    await update(ref(db, `queue/${n}`), { status: 'calling', time });
+    calledHistory = [n, ...calledHistory.filter(x => x !== n)].slice(0, 6);
+    await set(ref(db, 'current'), { num: n, history: calledHistory, time });
+    await set(ref(db, 'history'), calledHistory);
+  };
+
+  window.completeNum = async function(n) {
+    await update(ref(db, `queue/${n}`), { status: 'done' });
+    // historyだけ別パスで更新（currentを触らないので音が鳴らない）
+    calledHistory = calledHistory.filter(x => x !== n);
+    await set(ref(db, 'history'), calledHistory);
+  };
+
+  window.clearAll = async function() {
+    if (!confirm('履歴をすべてクリアしますか？')) return;
+    await set(ref(db, 'queue'), null);
+    await set(ref(db, 'current'), null);
+    await set(ref(db, 'history'), null);
+    calledHistory = [];
+    inputStr = '';
+    updateDisplay();
+  };
+
+  function renderQueue() {
+    const list = document.getElementById('queueList');
+    const items = Object.values(queueData).sort((a, b) => ({ calling: 0, done: 1 }[a.status] ?? 9) - ({ calling: 0, done: 1 }[b.status] ?? 9));
+    if (items.length === 0) { list.innerHTML = '<div class="empty-state">まだ呼び出しはありません</div>'; return; }
+    list.innerHTML = items.map(q => `
+      <div class="queue-item ${q.status}">
+        <div class="q-num">${pad(q.num)}</div>
+        <div class="q-status">
+          <div class="label">${q.status === 'calling' ? '📢 Calling' : '✅ Done'}</div>
+          <div style="font-size:0.65rem;margin-top:2px;opacity:0.6">${new Date(q.time).toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'})}</div>
+        </div>
+        <div class="q-actions">
+          ${q.status !== 'done' ? `<button class="q-btn recall" onclick="recallNum(${q.num})">再呼出</button>` : ''}
+          ${q.status !== 'done' ? `<button class="q-btn complete" onclick="completeNum(${q.num})">完了</button>` : ''}
+        </div>
+      </div>
+    `).join('');
+  }
+</script>
+</body>
+</html>
